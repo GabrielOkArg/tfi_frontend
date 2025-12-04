@@ -1,0 +1,52 @@
+ .loaderContainer {
+  background-color: #8a8a8a;
+   height: 100vh;
+   width: 100vw;
+  display: flex;
+   justify-content: center;
+   align-items: center;
+ }
+
+ .loaderWrapper {
+   position: relative;
+   width: 150px;
+   height: auto;
+ }
+
+ .loaderLogo {
+   width: 100%;
+   display: block;
+   position: relative;
+   z-index: 1;
+   filter: brightness(0) invert(1); /* Blanco inicial */
+ }
+
+
+.loaderOverlay {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 100%;
+   background: linear-gradient(
+     90deg,
+     white 0%,
+     black 33%,
+     #D5BADA 66%,
+     white 100%
+   );
+   animation: moveGradient 3s linear infinite;
+   mix-blend-mode: screen;
+   z-index: 2;
+   pointer-events: none;
+   opacity: 1;
+ }
+
+@keyframes moveGradient {
+   0% {
+     left: -100%;
+   }
+   100% {
+     left: 100%;
+   }
+ }
