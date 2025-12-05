@@ -459,7 +459,7 @@ export const Reportes = () => {
     const map = new Map();
 
     reportesFiltrados
-      .filter((r: any) => r.estado?.toLowerCase() === "finalizado")
+      .filter((r: any) => r.estado?.toLowerCase() === "finaliazado")
       .forEach((r: any) => {
         const area = r.areaNombre || "Sin área";
         map.set(area, (map.get(area) || 0) + 1);
@@ -475,7 +475,7 @@ export const Reportes = () => {
   // Total gastos finalizados
   const totalFinalizados = useMemo(() => {
     return reportesFiltrados
-      .filter((r: any) => r.estado?.toLowerCase() === "finalizado")
+      .filter((r: any) => r.estado?.toLowerCase() === "finaliazado")
       .reduce((sum, r:any) => sum + (r.costo || 0), 0);
   }, [reportesFiltrados]);
 
@@ -491,7 +491,7 @@ export const Reportes = () => {
     const map = new Map();
 
     reportesFiltrados
-      .filter((r: any) => r.estado?.toLowerCase() === "finalizado")
+      .filter((r: any) => r.estado?.toLowerCase() === "finaliazado")
       .forEach((r: any) => {
         const area = r.areaNombre || "Sin área";
         map.set(area, (map.get(area) || 0) + (r.costo || 0));
@@ -538,7 +538,7 @@ export const Reportes = () => {
 
   const exportToPDF = async () => {
   if (!pdfRef.current) return;
-
+showSpinner?.();
   const canvas = await html2canvas(pdfRef.current, {
     scale: 2,
     backgroundColor: "#ffffff"
@@ -571,6 +571,7 @@ export const Reportes = () => {
   }
 
   pdf.save("reportes.pdf");
+  hideSpinner?.();
 };
 
   return (
@@ -584,7 +585,7 @@ export const Reportes = () => {
         <Card sx={{ flex: 1 }}>
           <CardContent>
             <Typography variant="h6">Gastos Finalizados</Typography>
-            <Typography variant="h5" color="primary" fontWeight="bold">
+            <Typography variant="h5" color="white" fontWeight="bold" >
               ${totalFinalizados.toLocaleString()}
             </Typography>
           </CardContent>

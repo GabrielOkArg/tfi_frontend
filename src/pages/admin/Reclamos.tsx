@@ -169,7 +169,7 @@ export const Reclamos = () => {
   formData.append("Descripcion", updated.descripcion || "");
   formData.append("AreaId", updated.areaId.toString());
   formData.append("UsuarioId",user?.userId?.toString() ?? "0");
-  formData.append("Costo", openReclamo.cotizacion?.toString() ?? "0");
+  formData.append("Costo", openReclamo.costo?.toString() ?? "0");
   formData.append("Estado", updated.estado);
 
   // Solo agregar archivo si existe
@@ -355,13 +355,16 @@ export const Reclamos = () => {
                       }}
                       fullWidth
                       variant="outlined"
-                      value={openReclamo.cotizacion}
-                      onChange={(e) => {
-                        const cotizacion = e.target.value;
-                        setOpenReclamo((prev) =>
-                          prev ? { ...prev, cotizacion } : prev
-                        );
-                      }}
+                      
+                      value={openReclamo.costo ?? ""}
+
+onChange={(e) => {
+  const costo = Number(e.target.value);
+  setOpenReclamo((prev) =>
+    prev ? { ...prev, costo } : prev
+  );
+}}
+
                     />
                   </Box>
                  
