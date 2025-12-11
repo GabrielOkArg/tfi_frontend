@@ -117,7 +117,7 @@ export const Areas = () => {
             <IconButton
               size="small"
               onClick={() => toggleExpand(node.id)}
-              sx={{ minWidth: 0, mr: 1, background:"black" }}
+              sx={{ minWidth: 0, mr: 1 }}
             >
               {isExpanded ? <ExpandMoreIcon  /> : <ChevronRightIcon />}
             </IconButton>
@@ -130,7 +130,7 @@ export const Areas = () => {
             <IconButton
               size="small"
               onClick={() => openCreateFor(node.id)}
-              sx={{background:'gray'}}
+             
             >
               <AddCircleOutlineIcon fontSize="small" />
             </IconButton>

@@ -33,7 +33,7 @@
 //     </BrowserRouter>
 //   );
 // }
-import {  Routes, Route } from "react-router-dom";
+import {  Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login/Login";
 import MainLayout from "../components/layouts/MainLayout";
 import HomePage from "../pages/HomePage";
@@ -43,6 +43,8 @@ import Usuarios from "../pages/admin/Usuarios";
 import { Areas } from "../pages/admin/Areas";
 import  MisReclamos  from "../pages/user/MisReclamos";
 import { Reportes } from "../pages/admin/Reportes";
+import { authService } from "../service/authService";
+import { ReclamosTecnico } from "../pages/tecnico/Reclamos";
 
 export default function AppRouter() {
   return (
@@ -54,7 +56,9 @@ export default function AppRouter() {
         {/* Rutas privadas */}
         <Route >
           <Route element={<MainLayout />}>
-            <Route index element={<HomePage />} />
+            <Route index element={
+              authService.isAuthenticated() ? <HomePage /> : <Navigate to="/login" replace />
+            } />
             <Route path="areas" element={
               <PrivateRoute>
                 <Areas />
@@ -78,6 +82,11 @@ export default function AppRouter() {
               <Route path="reporte"  element={
               <PrivateRoute>
                 <Reportes />
+              </PrivateRoute>
+            }  />
+            <Route path="reclamostecnico"  element={
+              <PrivateRoute>
+                <ReclamosTecnico />
               </PrivateRoute>
             }  />
           </Route>

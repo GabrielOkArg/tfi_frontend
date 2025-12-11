@@ -58,7 +58,7 @@ console.log(user)
         );
       case "tecnico":
         return (
-          <Button color="inherit" onClick={() => handleNavigate("/reclamos")}>
+          <Button color="inherit" onClick={() => handleNavigate("/reclamostecnico")}>
             Reclamos
           </Button>
         );

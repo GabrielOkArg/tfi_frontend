@@ -23,6 +23,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { reclamosService } from "../../service/reclamosService";
@@ -45,16 +47,18 @@ type Reclamo = {
   presupuesto: string;
   costo: number;
 };
-
-export const Reclamos = () => {
-  const [reclamos, setReclamos] = useState<Reclamo[]>([]);
+export const ReclamosTecnico = () => {
+   const [reclamos, setReclamos] = useState<Reclamo[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [openReclamo, setOpenReclamo] = useState<Reclamo | null>(null);
   const [selectedEstado, setSelectedEstado] = useState<string>("");
+  const [comentarioTecnico, setComentarioTecnico] = useState<string>("");
   const { showSpinner, hideSpinner } = useSpinner();
   const [newFile, setnewFile] = useState<File | null>(null);
   const { user } = useAuth();
+  const [tabValue, setTabValue] = useState(0);
+  
   useEffect(() => {
     getData();
   }, []);
@@ -72,6 +76,18 @@ export const Reclamos = () => {
     }));
 
     let filtered = parsed;
+
+    // Filtrar según la pestaña activa
+    if (tabValue === 0) {
+      // Pestaña "Técnico": solo reclamos en estado "Tecnico"
+      filtered = filtered.filter((r) => r.estado === "Tecnico");
+    } else if (tabValue === 1) {
+      // Pestaña "Para Cotizar": solo reclamos en "Para cotizar"
+      filtered = filtered.filter((r) => r.estado === "Para cotizar");
+    } else if (tabValue === 2) {
+      // Pestaña "Finalizados": solo reclamos en "Finalizado tecnico"
+      filtered = filtered.filter((r) => r.estado === "Finalizado tecnico");
+    }
 
     if (startDate) {
       const s = new Date(startDate);
@@ -91,14 +107,18 @@ export const Reclamos = () => {
         new Date(a.fechaCreacion).getTime()
     );
     return filtered;
-  }, [reclamos, startDate, endDate]);
+  }, [reclamos, startDate, endDate, tabValue]);
 
   const handleOpen = (r: Reclamo) => {
     setOpenReclamo(r);
     setSelectedEstado(r.estado || "");
+    setComentarioTecnico(r.comentarioTecnico || "");
   };
 
-  const handleClose = () => setOpenReclamo(null);
+  const handleClose = () => {
+    setOpenReclamo(null);
+    setComentarioTecnico("");
+  };
 
   const formatDate = (iso?: string) => {
     if (!iso) return "";
@@ -161,6 +181,7 @@ export const Reclamos = () => {
     const updated: Reclamo = {
       ...openReclamo,
       estado: selectedEstado,
+      comentarioTecnico: comentarioTecnico || openReclamo.comentarioTecnico,
     };
 
     // Optimistic UI
@@ -179,6 +200,7 @@ export const Reclamos = () => {
     formData.append("UsuarioId", user?.userId?.toString() ?? "0");
     formData.append("Costo", openReclamo.costo?.toString() ?? "0");
     formData.append("Estado", updated.estado);
+    formData.append("ComentarioTecnico", comentarioTecnico || "");
 
     // Solo agregar archivo si existe
     if (newFile) {
@@ -192,6 +214,8 @@ export const Reclamos = () => {
 
       console.log("Reclamo actualizado:", response);
       toast.success("Estado actualizado correctamente");
+      getData(); // Recargar datos
+      handleClose();
     } catch (err) {
       console.error(err);
       toast.error("Error al actualizar el reclamo");
@@ -213,7 +237,7 @@ export const Reclamos = () => {
         }}
       >
         <Typography variant="h6" sx={{ color: "white" }}>
-          Reclamos
+          Reclamos Técnico
         </Typography>
 
         <TextField
@@ -258,6 +282,20 @@ export const Reclamos = () => {
           Limpiar
         </Button>
       </Stack>
+
+      {/* Tabs para cambiar entre solapas */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+        <Tabs 
+          value={tabValue} 
+          onChange={(_, newValue) => setTabValue(newValue)}
+          textColor="primary"
+          indicatorColor="primary"
+        >
+          <Tab label="Reclamos en Técnico" />
+          <Tab label="Para Cotizar" />
+          <Tab label="Finalizados" />
+        </Tabs>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table>
@@ -344,93 +382,55 @@ export const Reclamos = () => {
                 </Box>
               )}
 
-              <Box mt={2}>
-                <FormControl
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                
-                >
-                  <InputLabel id="estado-label">Estado</InputLabel>
-                  <Select
-                    labelId="estado-label"
-                    value={selectedEstado}
-                    label="Estado"
-                    onChange={(e) =>
-                      setSelectedEstado(e.target.value as string)
-                    }
-                  >
-                    <MenuItem value="Pendiente">Pendiente</MenuItem>
-                    <MenuItem value="Tecnico">Tecnico</MenuItem>
-                    <MenuItem value="En curso">En curso</MenuItem>
-                    <MenuItem value="En cotizacion">En cotizacion</MenuItem>
-                    <MenuItem value="Finaliazado">Finaliazado</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-              {selectedEstado === "En cotizacion" && (
+              {/* Solo permitir edición si está en solapa Técnico y en estado Tecnico */}
+              {tabValue === 0 && openReclamo.estado === "Tecnico" && (
                 <>
                   <Box mt={2}>
-                    <TextField
-                      label="Monto de Cotización"
-                      type="number"
-                      sx={{
-                        borderColor: "white",
-                      }}
+                    <FormControl
                       fullWidth
+                      size="small"
                       variant="outlined"
-                      value={openReclamo.costo ?? ""}
-                      onChange={(e) => {
-                        const costo = Number(e.target.value);
-                        setOpenReclamo((prev) =>
-                          prev ? { ...prev, costo } : prev
-                        );
-                      }}
-                    />
+                    >
+                      <InputLabel id="estado-label">Estado</InputLabel>
+                      <Select
+                        labelId="estado-label"
+                        value={selectedEstado}
+                        label="Estado"
+                        onChange={(e) =>
+                          setSelectedEstado(e.target.value as string)
+                        }
+                      >
+                        <MenuItem value="Para cotizar">Para cotizar</MenuItem>
+                        <MenuItem value="Finalizado tecnico">Finalizado técnico</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Box>
 
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2">
-                      Presupuesto (opcional)
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      spacing={2}
-                      alignItems="center"
-                      sx={{ mt: 1 }}
-                    >
-                      <Button
-                        variant="outlined"
-                        component="label"
-                        sx={{
-                          color: "black",
-                          background: "white",
-                        }}
-                      >
-                        Seleccionar archivo
-                        <input
-                          hidden
-                          type="file"
-                          onChange={(e) => {
-                            const f = e.target.files && e.target.files[0];
-                            if (f) {
-                              setnewFile(f);
-                            }
-                          }}
-                        />
-                      </Button>
-                    </Stack>
-                    {newFile && (
-                      <Typography
-                        variant="body2"
-                        sx={{ mt: 1, color: "white" }}
-                      >
-                        Archivo seleccionado: {newFile.name}
-                      </Typography>
-                    )}
+                  <Box mt={2}>
+                    <TextField
+                      label="Comentario Técnico"
+                      multiline
+                      rows={4}
+                      fullWidth
+                      variant="outlined"
+                      value={comentarioTecnico}
+                      onChange={(e) => setComentarioTecnico(e.target.value)}
+                      placeholder="Ingrese observaciones o comentarios técnicos..."
+                    />
                   </Box>
                 </>
               )}
+
+              {(tabValue === 1 || tabValue === 2) && (
+                <Box mt={2}>
+                  <Typography variant="body2" color="info.main" fontWeight="bold">
+                    {tabValue === 1 
+                      ? "Este reclamo está en proceso de cotización y no puede modificarse desde aquí."
+                      : "Este reclamo ya ha sido finalizado por el técnico y no puede modificarse."}
+                  </Typography>
+                </Box>
+              )}
+              
               {openReclamo.presupuesto !== "" && (
                 <>
                   <Box mt={2}>
@@ -481,13 +481,15 @@ export const Reclamos = () => {
           ) : null}
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSaveEstado}
-          >
-            Guardar
-          </Button>
+          {tabValue === 0 && openReclamo?.estado === "Tecnico" && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSaveEstado}
+            >
+              Guardar
+            </Button>
+          )}
           <Button onClick={handleClose} variant="contained" color="secondary">
             Cerrar
           </Button>
@@ -495,6 +497,4 @@ export const Reclamos = () => {
       </Dialog>
     </Box>
   );
-};
-
-export default Reclamos;
+}
