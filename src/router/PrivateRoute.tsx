@@ -6,15 +6,31 @@
 // };
 
 // export default PrivateRoute;
+// import { Navigate } from "react-router-dom";
+// import { authService } from "../service/authService";
+// import type { JSX } from "react";
+
+// export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+//     if (!authService.isAuthenticated()) {
+//         authService.logout();
+//         return <Navigate to="/login" replace />;
+//     }
+
+//     return children;
+// };
 import { Navigate } from "react-router-dom";
-import { authService } from "../service/authService";
-import type { JSX } from "react";
+import { useContext, type JSX } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-    if (!authService.isAuthenticated()) {
-        authService.logout();
-        return <Navigate to="/login" replace />;
-    }
+  const auth = useContext(AuthContext);
 
-    return children;
+  // Mientras carga el AuthProvider → evita parpadeo
+  if (auth?.loading) return null;
+
+  if (!auth?.user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };

@@ -6,8 +6,8 @@ import { useSpinner } from "../../components/share/context/SpinnerContext";
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SecurityIcon from '@mui/icons-material/Security';
 import SpeedIcon from '@mui/icons-material/Speed';
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { useEffect } from "react";
 
 type LoginFormValues = {
   email: string;
@@ -16,16 +16,16 @@ type LoginFormValues = {
 
 export default function Login() {
   const { register, handleSubmit } = useForm<LoginFormValues>();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const { showSpinner, hideSpinner } = useSpinner();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   // Redirigir si ya está autenticado
-  useEffect(() => {
-    if (user) {
-      navigate("/", { replace: true });
-    }
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (user) {
+  //     navigate("/", { replace: true });
+  //   }
+  // }, [user, navigate]);
 
   const onSubmit = async (data: LoginFormValues) => {
     try {

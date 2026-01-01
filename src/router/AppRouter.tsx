@@ -1,98 +1,101 @@
-// import React, { type JSX } from "react";
-// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// import {  Routes, Route, Navigate } from "react-router-dom";
 // import Login from "../pages/Login/Login";
-// // import Dashboard from "../pages/Dashboard/Dashboard";
-// // import Areas from "../pages/Areas/Areas";
-// // import Reclamos from "../pages/Reclamos/Reclamos";
 // import MainLayout from "../components/layouts/MainLayout";
+// import HomePage from "../pages/HomePage";
+// import {PrivateRoute} from "./PrivateRoute";
+// import { Reclamos } from "../pages/admin/Reclamos";
+// import Usuarios from "../pages/admin/Usuarios";
+// import { Areas } from "../pages/admin/Areas";
+// import  MisReclamos  from "../pages/user/MisReclamos";
+// import { Reportes } from "../pages/admin/Reportes";
+// import { authService } from "../service/authService";
+// import { ReclamosTecnico } from "../pages/tecnico/Reclamos";
 
 // export default function AppRouter() {
-//   const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-//     const token = localStorage.getItem("token");
-//     return token ? (children as JSX.Element) : <Navigate to="/login" />;
-//   };
-
 //   return (
-//     <BrowserRouter>
+   
 //       <Routes>
+
 //         <Route path="/login" element={<Login />} />
 
-//         <Route
-//           path="/"
-//           element={
-//             <PrivateRoute>
-//               <MainLayout />
-//             </PrivateRoute>
-//           }
-//         >
-//           {/* <Route index element={<Dashboard />} />
-//           <Route path="areas" element={<Areas />} />
-//           <Route path="reclamos" element={<Reclamos />} /> */}
+//         {/* Rutas privadas */}
+//         <Route >
+//           <Route element={<MainLayout />}>
+//             <Route index element={
+//               authService.isAuthenticated() ? <HomePage /> : <Navigate to="/login" replace />
+//             } />
+//             <Route path="areas" element={
+//               <PrivateRoute>
+//                 <Areas />
+//               </PrivateRoute>
+//             } />
+//             <Route path="reclamos"  element={
+//               <PrivateRoute>
+//                 <Reclamos />
+//               </PrivateRoute>
+//             }  />
+//             <Route path="usuarios"  element={
+//               <PrivateRoute>
+//                 <Usuarios />
+//               </PrivateRoute>
+//             }  />
+//             <Route path="mis-reclamos"  element={
+//               <PrivateRoute>
+//                 <MisReclamos />
+//               </PrivateRoute>
+//             }  />
+//               <Route path="reporte"  element={
+//               <PrivateRoute>
+//                 <Reportes />
+//               </PrivateRoute>
+//             }  />
+//             <Route path="reclamostecnico"  element={
+//               <PrivateRoute>
+//                 <ReclamosTecnico />
+//               </PrivateRoute>
+//             }  />
+//           </Route>
 //         </Route>
+
 //       </Routes>
-//     </BrowserRouter>
+   
 //   );
 // }
-import {  Routes, Route, Navigate } from "react-router-dom";
+
+
+
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login/Login";
 import MainLayout from "../components/layouts/MainLayout";
 import HomePage from "../pages/HomePage";
-import {PrivateRoute} from "./PrivateRoute";
+import { PrivateRoute } from "./PrivateRoute";
 import { Reclamos } from "../pages/admin/Reclamos";
 import Usuarios from "../pages/admin/Usuarios";
 import { Areas } from "../pages/admin/Areas";
-import  MisReclamos  from "../pages/user/MisReclamos";
+import MisReclamos from "../pages/user/MisReclamos";
 import { Reportes } from "../pages/admin/Reportes";
-import { authService } from "../service/authService";
 import { ReclamosTecnico } from "../pages/tecnico/Reclamos";
 
 export default function AppRouter() {
   return (
-   
-      <Routes>
+    <Routes>
+      {/* Ruta pública */}
+      <Route path="/login" element={<Login />} />
 
-        <Route path="/login" element={<Login />} />
+      {/* Rutas privadas */}
+      <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+        <Route index element={<HomePage />} />
+        <Route path="areas" element={<Areas />} />
+        <Route path="reclamos" element={<Reclamos />} />
+        <Route path="usuarios" element={<Usuarios />} />
+        <Route path="mis-reclamos" element={<MisReclamos />} />
+        <Route path="reporte" element={<Reportes />} />
+        <Route path="reclamostecnico" element={<ReclamosTecnico />} />
+      </Route>
 
-        {/* Rutas privadas */}
-        <Route >
-          <Route element={<MainLayout />}>
-            <Route index element={
-              authService.isAuthenticated() ? <HomePage /> : <Navigate to="/login" replace />
-            } />
-            <Route path="areas" element={
-              <PrivateRoute>
-                <Areas />
-              </PrivateRoute>
-            } />
-            <Route path="reclamos"  element={
-              <PrivateRoute>
-                <Reclamos />
-              </PrivateRoute>
-            }  />
-            <Route path="usuarios"  element={
-              <PrivateRoute>
-                <Usuarios />
-              </PrivateRoute>
-            }  />
-            <Route path="mis-reclamos"  element={
-              <PrivateRoute>
-                <MisReclamos />
-              </PrivateRoute>
-            }  />
-              <Route path="reporte"  element={
-              <PrivateRoute>
-                <Reportes />
-              </PrivateRoute>
-            }  />
-            <Route path="reclamostecnico"  element={
-              <PrivateRoute>
-                <ReclamosTecnico />
-              </PrivateRoute>
-            }  />
-          </Route>
-        </Route>
-
-      </Routes>
-   
+      {/* Ruta catch-all: si no hay match, redirigir */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
